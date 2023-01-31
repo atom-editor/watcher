@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18.x
+          registry-url: https://registry.npmjs.org/
+      - name: Install Clang
+        run: sudo apt-get install -y build-essential && sudo apt-get -y install clang
+      - name: Install greenkeeper
+        run: npm install -g greenkeeper-lockfile@1
+      - name: Lockfile update
+        run: npm run greenkeeper-lockfile-update
+      - run: npm i
+      - name: GH CI
+        run: npm run ci:gh
+      - name: Lint
+        run: npm run lint:js
+      - name: Lockfile upload
+        run: npm run greenkeeper-lockfile-upload
